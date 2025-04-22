@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Phone Number Details</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            padding: 40px;
+            text-align: center;
+            background-color: #f2f2f2;
+        }
+        input {
+            padding: 10px;
+            font-size: 16px;
+            width: 300px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            margin-left: 10px;
+        }
+        #result {
+            margin-top: 30px;
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h2>📱 Phone Number Detail Checker</h2>
+    <input type="text" id="phone" placeholder="e.g. +918888888888">
+    <button onclick="checkNumber()">Check</button>
+
+    <div id="result"></div>
+
+    <script>
+        async function checkNumber() {
+            const phone = document.getElementById("phone").value;
+            const resultDiv = document.getElementById("result");
+
+            resultDiv.innerHTML = "🔍 Checking...";
+
+            const response = await fetch("/check", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ phone: phone })
+            });
+
+            if (response.ok) {
+                const data = await response.json();
+                if (data.valid) {
+                    resultDiv.innerHTML = `
+                        <h3>✅ Valid Number</h3>
+                        <p><strong>Carrier:</strong> ${data.carrier}</p>
+                        <p><strong>Region:</strong> ${data.region}</p>
+                        <p><strong>Type:</strong> ${data.type}</p>
+                        <p><strong>Timezone:</strong> ${data.timezone.join(', ')}</p>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `<p style="color:red;">❌ ${data.error}</p>`;
+                }
+            } else {
+                resultDiv.innerHTML = `<p style="color:red;">⚠️ Server error.</p>`;
+            }
+        }
+    </script>
+</body>
+</html>
